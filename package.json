@@ -1,0 +1,19 @@
+{
+  "name": "ay2324s1-assignment-6-g11",
+  "version": "1.0.0",
+  "description": "serverless function",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CS3219-AY2324S1/ay2324s1-assignment-6-g11.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/CS3219-AY2324S1/ay2324s1-assignment-6-g11/issues"
+  },
+  "homepage": "https://github.com/CS3219-AY2324S1/ay2324s1-assignment-6-g11#readme"
+}
