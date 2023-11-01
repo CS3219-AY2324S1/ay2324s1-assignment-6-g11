@@ -1,0 +1,9 @@
+# Serverless Framework
+.serverless/
+.env
+
+# Dependencies
+node_modules/
+
+# Build output
+dist/
