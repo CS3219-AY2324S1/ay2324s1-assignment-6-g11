@@ -7,7 +7,7 @@ provider:
   stage: dev
   region: us-east-1
   environment:
-    MONGO_ATLAS_URL: <mongodb-uri>
+    MONGO_ATLAS_URL: ${env:MONGO_ATLAS_URL}
 
 functions:
   fetchAndStoreDailyQuestion:
