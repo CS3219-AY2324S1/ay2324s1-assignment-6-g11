@@ -1,3 +1,5 @@
+import { MongoClient, ServerApiVersion } from "mongodb";
+
 const LEETCODE_API_ENDPOINT = 'https://leetcode.com/graphql';
 const DAILY_CODING_CHALLENGE_QUERY = `
 query questionOfToday {
@@ -70,6 +72,16 @@ query questionOfToday {
 }
 }`;
 
+const uri = process.env.MONGO_ATLAS_URL;
+
+// Create a MongoClient with a MongoClientOptions object to set the Stable API version
+const mongoClient = new MongoClient(uri, {
+	serverApi: {
+		version: ServerApiVersion.v1,
+		deprecationErrors: true,
+	},
+});
+
 export const handler = async (event) => {
 	let responseData;
 
@@ -84,37 +96,41 @@ export const handler = async (event) => {
 		responseData = response.json();
 
 		try {
-			const url = `https://api.codeparty.org/question`;
+			let db = mongoClient.db("question_db");
+			let collection = db.collection<Question>("questions");
+			// Find question with same title
+			let same_title_qn = await collection.findOne({ title: req.body.title });
+			if (same_title_qn) {
+				return {
+					statusCode: 400,
+					body: JSON.stringify({message: "Question with same title already exists: " + same_title_qn._id})
+				};
+			}
 
-			const response = await fetch(url, {
-				method: "POST",
-				mode: "cors",
-				body: JSON.stringify({
-					title: responseData.title,
-					difficulty: responseData.difficulty,
-					topics: responseData.topicTags?.map((topic) => topic.name),
-					content: responseData.content,
-					testCasesInputs: responseData.exampleTestcases,
-					testCasesOutputs: [],
-					defaultCode: responseData.codeSnippets?.find((snippet) => snippet.lang === "python")?.code,
-				}),
-				headers: {
-					"Content-Type": "application/json",
-					"User-Id-Token": "leetcode",
-				},
+			let result = await collection.insertOne({
+				title: responseData.title,
+				content: responseData.content,
+				difficulty: responseData.difficulty,
+				dateCreated: new Date(),
+				dateUpdated: new Date(),
+				topics: responseData.topicTags?.map((topic) => topic.name),
+				testCasesInputs: responseData.exampleTestcases,
+				testCasesOutputs: [],
+				defaultCode: responseData.codeSnippets?.find((snippet) => snippet.lang === "python")?.code,
+				solution: req.body.solution ?? {},
+				author: 'Extracted from LeetCode'
 			});
-
-			if (!response.ok) {
-				console.error(`Error: ${response.status}`);
+			if (!result.acknowledged) {
 				return {
 					statusCode: 500,
-					body: JSON.stringify({ message: 'Failed to post the daily question' }),
+					body: JSON.stringify({message: "Failed to insert question"})
 				};
 			}
 			return {
-				statusCode: 200,
-				body: JSON.stringify({ message: 'Successfully posted the daily question' }),
+				statusCode: 201,
+				body: JSON.stringify(result.insertedId)
 			};
+
 		} catch (error) {
 			console.error(`Error: ${error}`);
 			return {
