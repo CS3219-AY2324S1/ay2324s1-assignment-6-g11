@@ -9,6 +9,9 @@ provider:
   environment:
     MONGO_ATLAS_URL: ${env:MONGO_ATLAS_URL}
 
+plugins:
+  - serverless-google-cloudfunctions
+
 functions:
   fetchAndStoreDailyQuestion:
     handler: handler
