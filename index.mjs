@@ -82,51 +82,51 @@ export const handler = async (event) => {
 
 		console.log(response.json());
 		responseData = response.json();
+
+		try {
+			const url = `https://api.codeparty.org/question`;
+
+			const response = await fetch(url, {
+				method: "POST",
+				mode: "cors",
+				body: JSON.stringify({
+					title: responseData.title,
+					difficulty: responseData.difficulty,
+					topics: responseData.topicTags?.map((topic) => topic.name),
+					content: responseData.content,
+					testCasesInputs: responseData.exampleTestcases,
+					testCasesOutputs: [],
+					defaultCode: responseData.codeSnippets?.find((snippet) => snippet.lang === "python")?.code,
+				}),
+				headers: {
+					"Content-Type": "application/json",
+					"User-Id-Token": "leetcode",
+				},
+			});
+
+			if (!response.ok) {
+				console.error(`Error: ${response.status}`);
+				return {
+					statusCode: 500,
+					body: JSON.stringify({ message: 'Failed to post the daily question' }),
+				};
+			}
+			return {
+				statusCode: 200,
+				body: JSON.stringify({ message: 'Successfully posted the daily question' }),
+			};
+		} catch (error) {
+			console.error(`Error: ${error}`);
+			return {
+				statusCode: 500,
+				body: JSON.stringify({ message: 'Failed to post the daily question' }),
+			};
+		}
 	} catch (error) {
 		console.error(`Error: ${error}`);
 		return {
 			statusCode: 500,
 			body: JSON.stringify({ message: 'Failed to fetch the daily question' }),
-		};
-	}
-
-	try {
-		const url = `https://api.codeparty.org/question`;
-
-		const response = await fetch(url, {
-			method: "POST",
-			mode: "cors",
-			body: JSON.stringify({
-				title: responseData.title,
-				difficulty: responseData.difficulty,
-				topics: responseData.topicTags?.map((topic) => topic.name),
-				content: responseData.content,
-				testCasesInputs: responseData.exampleTestcases,
-				testCasesOutputs: [],
-				defaultCode: responseData.codeSnippets?.find((snippet) => snippet.lang === "python")?.code,
-			}),
-			headers: {
-				"Content-Type": "application/json",
-				"User-Id-Token": "leetcode",
-			},
-		});
-
-		if (!response.ok) {
-			console.error(`Error: ${response.status}`);
-			return {
-				statusCode: 500,
-				body: JSON.stringify({ message: 'Failed to post the daily question' }),
-			};
-		} 
-		return {
-			statusCode: 200,
-			body: JSON.stringify({ message: 'Successfully posted the daily question' }),
-		};
-	} catch (error) {
-		console.error(`Error: ${error}`);
-		return {
-			statusCode: 500,
-			body: JSON.stringify({ message: 'Failed to post the daily question' }),
 		};
 	}
 };
