@@ -39,7 +39,9 @@ jobs:
           node-version: ${{ env.NODE_VER }}
 
       - name: Clean Install dependencies
-        run: npm ci
+        run: |- 
+          npm install -g serverless
+          npm ci
 
       - name: Deploy Serverless
         run: serverless deploy

@@ -18,7 +18,6 @@
   "homepage": "https://github.com/CS3219-AY2324S1/ay2324s1-assignment-6-g11#readme",
   "dependencies": {
     "node-fetch": "^3.3.2",
-    "serverless": "^3.36.0",
     "serverless-google-cloudfunctions": "^4.6.0"
   }
 }
