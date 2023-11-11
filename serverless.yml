@@ -2,16 +2,16 @@ org: ckcherry23
 app: leetcode-daily-question
 service: leetcode-daily-question
 provider:
-  name: aws
+  name: google
   runtime: nodejs18.x
-  stage: dev
-  region: us-east-1
+  project: peerprep-group11-prod
+  region: asia-southeast1
   environment:
     MONGO_ATLAS_URL: ${env:MONGO_ATLAS_URL}
 
 functions:
   fetchAndStoreDailyQuestion:
-    handler: input.handler
+    handler: handler
     events:
       - http:
           path: fetch

@@ -18,6 +18,18 @@ jobs:
         with:
           fetch-depth: 0
 
+      - id: 'auth'
+        name: Authenticate to Google Cloud
+        uses: 'google-github-actions/auth@v1'
+        with:
+          token_format: 'access_token'
+          workload_identity_provider: projects/345207492413/locations/global/workloadIdentityPools/github-actions-pool/providers/github-actions-oidc
+          service_account: 'assignment-6-workflow@peerprep-group11-prod.iam.gserviceaccount.com'
+
+      # Setup gcloud CLI
+      - name: Setup Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
