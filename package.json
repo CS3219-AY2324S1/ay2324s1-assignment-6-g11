@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/CS3219-AY2324S1/ay2324s1-assignment-6-g11#readme",
   "dependencies": {
+    "@google-cloud/functions-framework": "^3.3.0",
     "mongodb": "^6.2.0",
     "node-fetch": "^3.3.2",
     "serverless-google-cloudfunctions": "^4.6.0"

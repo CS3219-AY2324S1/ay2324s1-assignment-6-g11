@@ -86,7 +86,7 @@ const mongoClient = new MongoClient(uri, {
 
 functions.http('httpHandler', (req, res) => {
 	handler().then((internalResponse) => {
-		res.statusCode(internalResponse.statusCode).send(internalResponse.body);
+		res.status(internalResponse.statusCode).send(internalResponse.body);
 	});
 })
 
