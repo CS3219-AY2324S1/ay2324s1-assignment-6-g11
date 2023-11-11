@@ -9,7 +9,7 @@ env:
 
 jobs:
   mainbuild:
-    name: CI on Ubuntu 22.04
+    name: Deploy serverless function on Ubuntu 22.04
     runs-on: ubuntu-22.04
     permissions:
       contents: 'read'
@@ -34,6 +34,12 @@ jobs:
         with:
           name: 'fetchAndStoreDailyQuestion'
           runtime: 'nodejs18'
+          region: 'asia-southeast1'
+          project_id: 'peerprep-group11-prod'
           entry_point: httpHandler
           env_vars:
             MONGO_ATLAS_URL=${{ secrets.MONGO_ATLAS_URL_PROD }}
+
+      # Example of using the output
+      - id: 'test'
+        run: 'curl "${{ steps.deploy.outputs.url }}"'
