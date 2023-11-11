@@ -102,6 +102,7 @@ const handler = async () => {
 			body: JSON.stringify({ query: DAILY_CODING_CHALLENGE_QUERY }),
 		});
 
+		console.log(response)
 		responseData = await response.json();
 		console.log(responseData)
 
