@@ -1,4 +1,6 @@
 const { MongoClient, ServerApiVersion } = require("mongodb");
+const functions = require('@google-cloud/functions-framework');
+
 
 const LEETCODE_API_ENDPOINT = 'https://leetcode.com/graphql';
 const DAILY_CODING_CHALLENGE_QUERY = `
@@ -82,7 +84,17 @@ const mongoClient = new MongoClient(uri, {
 	},
 });
 
-export const handler = async (event) => {
+functions.http('httpHandler', (req, res) => {
+	handler().then((internalResponse) => {
+		res.statusCode(internalResponse.statusCode).send(internalResponse.body);
+	});
+})
+
+functions.cloudEvent('cloudEventHandler', cloudEvent => {
+	handler().then(() => {});
+})
+
+const handler = async () => {
 	let responseData;
 
 	try {
@@ -99,7 +111,7 @@ export const handler = async (event) => {
 			let db = mongoClient.db("question_db");
 			let collection = db.collection<Question>("questions");
 			// Find question with same title
-			let same_title_qn = await collection.findOne({ title: req.body.title });
+			let same_title_qn = await collection.findOne({ title: responseData.title });
 			if (same_title_qn) {
 				return {
 					statusCode: 400,
@@ -117,7 +129,7 @@ export const handler = async (event) => {
 				testCasesInputs: responseData.exampleTestcases,
 				testCasesOutputs: [],
 				defaultCode: responseData.codeSnippets?.find((snippet) => snippet.lang === "python")?.code,
-				solution: req.body.solution ?? {},
+				solution: responseData.solution ?? {},
 				author: 'Extracted from LeetCode'
 			});
 			if (!result.acknowledged) {
