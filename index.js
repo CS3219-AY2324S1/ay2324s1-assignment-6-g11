@@ -1,7 +1,6 @@
 const { MongoClient, ServerApiVersion } = require("mongodb");
 const functions = require('@google-cloud/functions-framework');
 
-
 const LEETCODE_API_ENDPOINT = 'https://leetcode.com/graphql';
 const DAILY_CODING_CHALLENGE_QUERY = `
 query questionOfToday {
@@ -103,12 +102,12 @@ const handler = async () => {
 			body: JSON.stringify({ query: DAILY_CODING_CHALLENGE_QUERY }),
 		});
 
-		console.log(response.json());
-		responseData = response.json();
+		responseData = await response.json();
+		console.log(responseData)
 
 		try {
 			let db = mongoClient.db("question_db");
-			let collection = db.collection<Question>("questions");
+			let collection = db.collection("questions");
 			// Find question with same title
 			let same_title_qn = await collection.findOne({ title: responseData.title });
 			if (same_title_qn) {
