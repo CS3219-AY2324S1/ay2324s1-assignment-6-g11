@@ -1,0 +1,19 @@
+org: ckcherry23
+app: leetcode-daily-question
+service: leetcode-daily-question
+provider:
+  name: aws
+  runtime: nodejs18.x
+  stage: dev
+  region: us-east-1
+  environment:
+    MONGO_ATLAS_URL: ${env:MONGO_ATLAS_URL}
+
+functions:
+  fetchAndStoreDailyQuestion:
+    handler: input.handler
+    events:
+      - http:
+          path: fetch
+          method: get
+      - schedule: cron(0 0 * * ? *)

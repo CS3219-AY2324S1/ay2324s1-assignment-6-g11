@@ -15,5 +15,9 @@
   "bugs": {
     "url": "https://github.com/CS3219-AY2324S1/ay2324s1-assignment-6-g11/issues"
   },
-  "homepage": "https://github.com/CS3219-AY2324S1/ay2324s1-assignment-6-g11#readme"
+  "homepage": "https://github.com/CS3219-AY2324S1/ay2324s1-assignment-6-g11#readme",
+  "dependencies": {
+    "node-fetch": "^3.3.2",
+    "serverless": "^3.36.0"
+  }
 }
