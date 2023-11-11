@@ -34,6 +34,6 @@ jobs:
         with:
           name: 'fetchAndStoreDailyQuestion'
           runtime: 'nodejs18'
-          entry_point: handler
+          entry_point: httpHandler
           env_vars:
             MONGO_ATLAS_URL=${{ secrets.MONGO_ATLAS_URL_PROD }}
