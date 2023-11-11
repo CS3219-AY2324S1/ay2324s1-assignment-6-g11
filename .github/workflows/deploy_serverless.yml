@@ -29,7 +29,12 @@ jobs:
           workload_identity_provider: projects/345207492413/locations/global/workloadIdentityPools/github-actions-pool/providers/github-actions-oidc
           service_account: 'assignment-6-workflow@peerprep-group11-prod.iam.gserviceaccount.com'
 
+      # Setup gcloud CLI
+      - name: Setup Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+
       - id: 'deploy'
+        name: Deploy the cloud function
         uses: 'google-github-actions/deploy-cloud-functions@v1'
         with:
           name: 'fetchAndStoreDailyQuestion'
@@ -42,4 +47,9 @@ jobs:
 
       # Example of using the output
       - id: 'test'
-        run: 'curl "${{ steps.deploy.outputs.url }}"'
+        name: Run a curl test
+        run: |-
+          curl "${{ steps.deploy.outputs.url }}" \
+            -H "Authorization: bearer $(gcloud auth print-identity-token)" \
+            -H "Content-Type: application/json" \
+            -d '{}'

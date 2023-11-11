@@ -84,14 +84,13 @@ const mongoClient = new MongoClient(uri, {
 	},
 });
 
-functions.http('httpHandler', (req, res) => {
-	handler().then((internalResponse) => {
-		res.status(internalResponse.statusCode).send(internalResponse.body);
-	});
+functions.http('httpHandler', async (req, res) => {
+	const handlerResponse = await handler();
+	res.status(handlerResponse.statusCode).send(handlerResponse.body);
 })
 
-functions.cloudEvent('cloudEventHandler', cloudEvent => {
-	handler().then(() => {});
+functions.cloudEvent('cloudEventHandler', async (cloudEvent) => {
+	await handler();
 })
 
 const handler = async () => {
