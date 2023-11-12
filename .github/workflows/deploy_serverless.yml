@@ -25,13 +25,8 @@ jobs:
         name: Authenticate to Google Cloud
         uses: 'google-github-actions/auth@v1'
         with:
-          token_format: 'access_token'
           workload_identity_provider: projects/345207492413/locations/global/workloadIdentityPools/github-actions-pool/providers/github-actions-oidc
           service_account: 'assignment-6-workflow@peerprep-group11-prod.iam.gserviceaccount.com'
-
-      # Setup gcloud CLI
-      - name: Setup Google Cloud SDK
-        uses: google-github-actions/setup-gcloud@v1
 
       - id: 'deploy'
         name: Deploy the cloud function
@@ -45,11 +40,20 @@ jobs:
           env_vars:
             MONGO_ATLAS_URL=${{ secrets.MONGO_ATLAS_URL_PROD }}
 
+      - id: 'authAgain'
+        name: Re-authenticate to Google Cloud, this time grabbing id_token
+        uses: 'google-github-actions/auth@v1'
+        with:
+          token_format: 'id_token'
+          id_token_audience: ${{ steps.deploy.outputs.url }}
+          workload_identity_provider: projects/345207492413/locations/global/workloadIdentityPools/github-actions-pool/providers/github-actions-oidc
+          service_account: 'assignment-6-workflow@peerprep-group11-prod.iam.gserviceaccount.com'
+
       # Example of using the output
       - id: 'test'
         name: Run a curl test
         run: |-
           curl "${{ steps.deploy.outputs.url }}" \
-            -H "Authorization: bearer $(gcloud auth print-identity-token --impersonate-service-account='assignment-6-workflow@peerprep-group11-prod.iam.gserviceaccount.com')" \
+            -H "Authorization: bearer ${{ steps.authAgain.outputs.id_token }}" \
             -H "Content-Type: application/json" \
             -d '{}'
