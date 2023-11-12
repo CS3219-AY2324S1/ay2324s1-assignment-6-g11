@@ -3,10 +3,6 @@ name: Deploy Serverless Function
 on:
   workflow_dispatch
 
-env:
-  NODE_VER: '18.x'
-  MONGO_ATLAS_URL: ${{ secrets.MONGO_ATLAS_URL_PROD }}
-
 jobs:
   mainbuild:
     name: Deploy serverless function on Ubuntu 22.04
@@ -28,11 +24,11 @@ jobs:
           workload_identity_provider: projects/345207492413/locations/global/workloadIdentityPools/github-actions-pool/providers/github-actions-oidc
           service_account: 'assignment-6-workflow@peerprep-group11-prod.iam.gserviceaccount.com'
 
-      - id: 'deploy'
-        name: Deploy the cloud function
+      - id: 'deployProd'
+        name: Deploy the cloud function for Prod
         uses: 'google-github-actions/deploy-cloud-functions@v1'
         with:
-          name: 'fetchAndStoreDailyQuestion'
+          name: 'fetchAndStoreDailyQuestionProd'
           runtime: 'nodejs18'
           region: 'asia-southeast1'
           project_id: 'peerprep-group11-prod'
@@ -40,20 +36,46 @@ jobs:
           env_vars:
             MONGO_ATLAS_URL=${{ secrets.MONGO_ATLAS_URL_PROD }}
 
-      - id: 'authAgain'
-        name: Re-authenticate to Google Cloud, this time grabbing id_token
+      - id: 'deployDev'
+        name: Deploy the cloud function for Dev
+        uses: 'google-github-actions/deploy-cloud-functions@v1'
+        with:
+          name: 'fetchAndStoreDailyQuestionDev'
+          runtime: 'nodejs18'
+          region: 'asia-southeast1'
+          project_id: 'peerprep-group11-prod'
+          entry_point: httpHandler
+          env_vars:
+            MONGO_ATLAS_URL=${{ secrets.MONGO_ATLAS_URL_DEV }}
+
+      - id: 'authAgainForProd'
+        name: Re-authenticate to Google Cloud, this time grabbing id_token to use for running to Prod
         uses: 'google-github-actions/auth@v1'
         with:
           token_format: 'id_token'
-          id_token_audience: ${{ steps.deploy.outputs.url }}
+          id_token_audience: ${{ steps.deployProd.outputs.url }}
           workload_identity_provider: projects/345207492413/locations/global/workloadIdentityPools/github-actions-pool/providers/github-actions-oidc
           service_account: 'assignment-6-workflow@peerprep-group11-prod.iam.gserviceaccount.com'
 
       # Example of using the output
-      - id: 'test'
-        name: Run a curl test
+      - id: 'testProd'
+        name: Run a curl test for Prod
         run: |-
-          curl "${{ steps.deploy.outputs.url }}" \
-            -H "Authorization: bearer ${{ steps.authAgain.outputs.id_token }}" \
-            -H "Content-Type: application/json" \
-            -d '{}'
+          curl "${{ steps.deployProd.outputs.url }}" \
+            -H "Authorization: bearer ${{ steps.authAgainForProd.outputs.id_token }}"
+
+      - id: 'authAgainForDev'
+        name: Re-authenticate to Google Cloud, this time grabbing id_token to use for running to Dev
+        uses: 'google-github-actions/auth@v1'
+        with:
+          token_format: 'id_token'
+          id_token_audience: ${{ steps.deployDev.outputs.url }}
+          workload_identity_provider: projects/345207492413/locations/global/workloadIdentityPools/github-actions-pool/providers/github-actions-oidc
+          service_account: 'assignment-6-workflow@peerprep-group11-prod.iam.gserviceaccount.com'
+
+      # Example of using the output
+      - id: 'testDev'
+        name: Run a curl test for Dev
+        run: |-
+          curl "${{ steps.deployDev.outputs.url }}" \
+            -H "Authorization: bearer ${{ steps.authAgainForDev.outputs.id_token }}" 

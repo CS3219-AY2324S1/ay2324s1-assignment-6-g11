@@ -3,10 +3,10 @@
 
 ## Pre-requisites:
 The following must be active:
-* The MongoDB remote database for the prod environment. The function will post the question directly to the prod
+* The MongoDB remote database for both the prod and dev environment. The function will post the question directly to the prod
 database.
 
-* Optionally, the production version of the entire application. This is useful for seeing the question on the 
+* Optionally, the prod and dev versions of the entire application. This is useful for seeing the question on the 
 application itself.
 
 ## How to run:
@@ -21,8 +21,10 @@ Screenshot below:
 ![Actions screenshot](./screenshots/workflow.png)
 
 ## Expected outputs:
+Two functions will be deployed, one for posting the fetched question to Dev and the other that does the same thing
+but for Prod.
 
-There are 2 possible outputs:
+For each function, there are 2 possible outputs:
 1. Successfully posted. In this case, the ID of the question after it is posted to MongoDB is shown
 
 2. Error 400 because the question has already been posted to MongoDB. The message is as follows:
