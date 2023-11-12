@@ -28,7 +28,7 @@ For each function, there are 2 possible outputs:
 1. Successfully posted. In this case, the ID of the question after it is posted to MongoDB is shown
 
 2. Error 400 because the question has already been posted to MongoDB. The message is as follows:
-`Question with same title already exists: <question ID in MongoDB>`
+`Question with same title of <question title> already exists: <question ID in MongoDB>`
 
 ## Caveat:
 You will need collaborator access to this repository to do the above steps. Feel free to contact any of us to request

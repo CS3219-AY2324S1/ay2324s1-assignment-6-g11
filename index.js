@@ -120,7 +120,7 @@ const handler = async () => {
 			if (same_title_qn) {
 				return {
 					statusCode: 400,
-					body: JSON.stringify({message: "Question with same title already exists: " + same_title_qn._id})
+					body: JSON.stringify({message: `Question with same title of ${title} already exists: ${same_title_qn._id}`})
 				};
 			}
 
@@ -156,7 +156,7 @@ const handler = async () => {
 			}
 			return {
 				statusCode: 201,
-				body: JSON.stringify(result.insertedId)
+				body: JSON.stringify( {message: `Successfully inserted question ${title} with stored ID ${result.insertedId}`})
 			};
 
 		} catch (error) {
