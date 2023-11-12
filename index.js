@@ -95,6 +95,8 @@ const handler = async () => {
 	let responseData;
 
 	try {
+		const encodedChallengeQuery = encodeURIComponent(DAILY_CODING_CHALLENGE_QUERY);
+
 		const response = await fetch(`${LEETCODE_API_ENDPOINT}?query=${encodedChallengeQuery}`, {
 			method: 'GET'
 		});
@@ -139,10 +141,10 @@ const handler = async () => {
 				difficulty: difficulty,
 				dateCreated: dateCreated,
 				dateUpdated: dateUpdated,
-				topics: question.topicTags?.map((topic) => topic.name),
+				topics: question.topicTags?.map((topic) => topic.name) ?? [],
 				testCasesInputs: [],
 				testCasesOutputs: [],
-				defaultCode: question.codeSnippets?.find((snippet) => snippet.lang === "python")?.code,
+				defaultCode: question.codeSnippets?.find((snippet) => snippet.lang === "python")?.code ?? {},
 				solution: {},
 				author: author
 			});
