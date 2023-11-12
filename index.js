@@ -70,7 +70,6 @@ query questionOfToday {
             note
         }
     }
-}
 }`;
 
 const uri = process.env.MONGO_ATLAS_URL;
@@ -96,21 +95,26 @@ const handler = async () => {
 	let responseData;
 
 	try {
-		const response = await fetch(LEETCODE_API_ENDPOINT, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ query: DAILY_CODING_CHALLENGE_QUERY }),
+		const response = await fetch(`${LEETCODE_API_ENDPOINT}?query=${encodedChallengeQuery}`, {
+			method: 'GET'
 		});
 
-		console.log(response)
 		responseData = await response.json();
-		console.log(responseData)
+		const question = responseData["data"]["activeDailyCodingChallengeQuestion"]["question"]
+
+		let difficulty = question.difficulty.toLowerCase();
+		let title = question.title;
+		let content = question.content;
+
+		let dateCreated = new Date();
+		let dateUpdated = new Date();
+		let author = 'ExtractedFromLeetCode'
 
 		try {
 			let db = mongoClient.db("question_db");
 			let collection = db.collection("questions");
 			// Find question with same title
-			let same_title_qn = await collection.findOne({ title: responseData.title });
+			let same_title_qn = await collection.findOne({ title: title });
 			if (same_title_qn) {
 				return {
 					statusCode: 400,
@@ -118,18 +122,29 @@ const handler = async () => {
 				};
 			}
 
+			/*
+				Test cases are lumped together like this:
+				'[[1,2,7],[3,6,7]]\n1\n6\n[[7,12],[4,5,15],[6],[15,19],[9,12,13]]\n15\n12'
+
+				The above is actually 2 cases in a single string for one question. Additionally, I'm not sure about
+				how each test case is formatted in other questions.
+
+				So test cases will be left blank for now.
+
+				No solutions are available for now either
+     	*/
 			let result = await collection.insertOne({
-				title: responseData.title,
-				content: responseData.content,
-				difficulty: responseData.difficulty,
-				dateCreated: new Date(),
-				dateUpdated: new Date(),
-				topics: responseData.topicTags?.map((topic) => topic.name),
-				testCasesInputs: responseData.exampleTestcases,
+				title: title,
+				content: content,
+				difficulty: difficulty,
+				dateCreated: dateCreated,
+				dateUpdated: dateUpdated,
+				topics: question.topicTags?.map((topic) => topic.name),
+				testCasesInputs: [],
 				testCasesOutputs: [],
-				defaultCode: responseData.codeSnippets?.find((snippet) => snippet.lang === "python")?.code,
-				solution: responseData.solution ?? {},
-				author: 'Extracted from LeetCode'
+				defaultCode: question.codeSnippets?.find((snippet) => snippet.lang === "python")?.code,
+				solution: {},
+				author: author
 			});
 			if (!result.acknowledged) {
 				return {
