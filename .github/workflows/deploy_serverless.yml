@@ -50,6 +50,6 @@ jobs:
         name: Run a curl test
         run: |-
           curl "${{ steps.deploy.outputs.url }}" \
-            -H "Authorization: bearer $(gcloud auth print-identity-token)" \
+            -H "Authorization: bearer $(gcloud auth print-identity-token --impersonate-service-account='assignment-6-workflow@peerprep-group11-prod.iam.gserviceaccount.com')" \
             -H "Content-Type: application/json" \
             -d '{}'
